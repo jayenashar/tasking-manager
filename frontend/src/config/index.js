@@ -1,5 +1,6 @@
 // API ENDPOINTS
 export const API_VERSION = process.env.REACT_APP_API_VERSION || 'v2';
+console.log('process.env.REACT_APP_API_URL', process.env.REACT_APP_API_URL);
 export const API_URL = process.env.REACT_APP_API_URL
   ? new URL('/api/' + API_VERSION + '/', process.env.REACT_APP_API_URL)
   : 'http://127.0.0.1:5000/api/' + API_VERSION + '/';

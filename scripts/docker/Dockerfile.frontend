@@ -3,11 +3,12 @@ WORKDIR /usr/src/app
 COPY ./frontend/package.json ./
 COPY ./frontend/yarn.lock ./
 COPY ./frontend/entrypoint.sh ./
+RUN ./entrypoint.sh
 
 FROM base AS debug
-COPY ./frontend .
+# COPY ./frontend .
 EXPOSE 3000
-ENTRYPOINT [ "/usr/src/app/entrypoint.sh" ]
+# ENTRYPOINT [ "/usr/src/app/entrypoint.sh" ]
 CMD ["yarn", "start"]
 
 

@@ -45,7 +45,7 @@ services:
       - ./tests:/usr/src/app/tests
       - ./migrations:/usr/src/app/migrations/
     ports:
-      - 5678:5678 #DebugPy
+      - 127.0.0.1:5678:5678 #DebugPy
     restart: unless-stopped
     healthcheck:
       test: curl --fail http://localhost:5000/api/docs
@@ -63,8 +63,11 @@ services:
           cpus: "1"
           memory: 100M
     labels:
-      - traefik.http.routers.backend.rule=(Host(`127.0.0.1`) || Host(`localhost`)) && PathPrefix(`/api/`)
+      - traefik.http.routers.backend.rule=(Host(`127.0.0.1`) || Host(`localhost`) || Host(`tasks.smartcitiestransport.com`)) && PathPrefix(`/api/`)
       - traefik.http.services.backend.loadbalancer.server.port=5000
+# https://doc.traefik.io/traefik/https/acme/#configuration-examples
+      - traefik.http.routers.backend.tls=true
+      - traefik.http.routers.backend.tls.certresolver=myresolver
     networks:
       - tm-net
 
@@ -112,6 +115,7 @@ services:
       - tasking-manager.env
     environment:
       - PYTHONPATH=/usr/src/app
+    restart: unless-stopped
     deploy:
       replicas: 1
       resources:
@@ -135,11 +139,15 @@ services:
       target: ${TARGET_TAG:-prod}
     env_file:
       - tasking-manager.env
+    restart: unless-stopped
     labels:
-      - traefik.http.routers.frontend.rule=Host(`127.0.0.1`) || Host(`localhost`)
+      - traefik.http.routers.frontend.rule=Host(`tasks.smartcitiestransport.com`)
       - traefik.http.services.frontend.loadbalancer.server.port=3000
-    # volumes:
-    #   - ./frontend:/usr/src/app
+# https://doc.traefik.io/traefik/https/acme/#configuration-examples
+      - traefik.http.routers.frontend.tls=true
+      - traefik.http.routers.frontend.tls.certresolver=myresolver
+    volumes:
+      - ./frontend:/usr/src/app
     networks:
       - tm-net
 
@@ -148,10 +156,16 @@ services:
     restart: always
     ports:
       - "${TM_DEV_PORT:-3000}:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command:
       - --entrypoints.web.address=:80
       - --providers.docker=true
+# https://doc.traefik.io/traefik/https/acme/#configuration-examples cli
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.myresolver.acme.email=jayen+letsencrypt2@smartcitiestransport.com
+      - --certificatesresolvers.myresolver.acme.storage=acme.json
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
     networks:
       - tm-net
