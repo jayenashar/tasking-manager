@@ -63,7 +63,7 @@ services:
           cpus: "1"
           memory: 100M
     labels:
-      - traefik.http.routers.backend.rule=(Host(`127.0.0.1`) || Host(`localhost`) || Host(`tasks.smartcitiestransport.com`)) && PathPrefix(`/api/`)
+      - traefik.http.routers.backend.rule=Host(`tasks.smartcitiestransport.com`) && PathPrefix(`/api/`)
       - traefik.http.services.backend.loadbalancer.server.port=5000
 # https://doc.traefik.io/traefik/https/acme/#configuration-examples
       - traefik.http.routers.backend.tls=true
@@ -152,7 +152,7 @@ services:
       - tm-net
 
   traefik:
-    image: traefik:v2.10
+    image: traefik:v2.11
     restart: always
     ports:
       - "${TM_DEV_PORT:-3000}:80"
