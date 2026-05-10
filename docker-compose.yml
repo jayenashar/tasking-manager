@@ -116,6 +116,10 @@ services:
     environment:
       - PYTHONPATH=/usr/src/app
     restart: unless-stopped
+    # Disable inherited HEALTHCHECK from base image — that's a curl on the
+    # backend HTTP API, but tm-cron-jobs has no web server, only a scheduler.
+    healthcheck:
+      disable: true
     deploy:
       replicas: 1
       resources:
