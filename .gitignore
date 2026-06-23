@@ -79,3 +79,6 @@ scripts/aws/infra/staging/variables.py
 
 # Files
 tests/test_db_dump/tm_sample_db.sql
+
+# Traefik ACME storage (contains TLS private key) — never commit
+letsencrypt/
